@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\API;
 
-use App\Models\OrdenTrabajoModel;
+use App\Models\WorkOrder;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
@@ -37,51 +37,43 @@ class DashboardController extends Controller
 
         switch ($data) {
             case 'week':
-                $ordenTrabajo = OrdenTrabajoModel::whereDate('created_at','<=', Carbon::now())
+                $workOrders = WorkOrder::whereDate('created_at','<=', Carbon::now())
                 ->whereDate('created_at','>=', Carbon::now()->subWeek())
                 ->get();
 
                 return response()->json([
-                    'ordenTrabajo' => $ordenTrabajo,
-                    'ganancias' => 1000,
-                    'trabajosRealizados' => 100
+                    'workOrders' => $workOrders
                 ]);
                 break;
             case 'month':
-                $ordenTrabajo = OrdenTrabajoModel::whereDate('created_at','<=', Carbon::now())
+                $workOrders = WorkOrder::whereDate('created_at','<=', Carbon::now())
                 ->whereDate('created_at','>=', Carbon::now()->subMonth())
                 ->get();
                 return response()->json([
-                    'ordenTrabajo' => $ordenTrabajo,
-                    'ganancias' => 1000,
-                    'trabajosRealizados' => 100
+                    'workOrders' => $workOrders
                 ]);
                 break;
             case 'year':
-                $ordenTrabajo = OrdenTrabajoModel::whereDate('created_at','<=', Carbon::now())
+                $workOrders = WorkOrder::whereDate('created_at','<=', Carbon::now())
                 ->whereDate('created_at','>=', Carbon::now()->subYear())
                 ->get();
                 return response()->json([
-                    'ordenTrabajo' => $ordenTrabajo,
-                    'ganancias' => 1000,
-                    'trabajosRealizados' => 100
+                    'workOrders' => $workOrders
                 ]);
                 break;
 
             default:
-                $ordenTrabajo = OrdenTrabajoModel::whereDate('created_at','<=', Carbon::now())
+                $workOrders = WorkOrder::whereDate('created_at','<=', Carbon::now())
                 ->whereDate('created_at','>=', Carbon::now()->subWeek())
                 ->get();
                 return response()->json([
-                    'ordenTrabajo' => $ordenTrabajo,
-                    'ganancias' => 1000,
-                    'trabajosRealizados' => 100
+                    'workOrders' => $workOrders
                 ]);
                 break;
         }
     }
 
-    public function getLastTrabajosRealizados()
+    public function getLastWorksCompleted()
     {
         try {
             $user = JWTAuth::parseToken()->authenticate();
@@ -91,8 +83,8 @@ class DashboardController extends Controller
         } catch (JWTException $e) {
             return $this->sendError([], $e->getMessage(), 500);
         }
-        $ordenTrabajo = OrdenTrabajoModel::get()->last();
-        return response()->json($ordenTrabajo);
+        $lastWorksCompleted = WorkOrder::get()->last();
+        return response()->json($lastWorksCompleted);
     }
 
 }

@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class TrabajosOTModel extends Model
+class WorkOrderTask extends Model
 {
     use HasFactory;
 
@@ -16,6 +16,6 @@ class TrabajosOTModel extends Model
 
     public function orden_trabajo()
     {
-        return $this->belongTo(OrdenTrabajoModel::class, 'ot_id');
+        return $this->belongTo(WorkOrder::class, 'ot_id');
     }
 }

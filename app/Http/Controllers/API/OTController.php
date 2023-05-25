@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\API;
 
-use App\Models\OrdenTrabajoModel;
-use App\Models\TrabajosOTModel;
+use App\Models\WorkOrder;
+use App\Models\WorkOrderTask;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
@@ -25,7 +25,7 @@ class OTController extends Controller
         return response()->json($response);
     }
 
-    public function getOrdenTrabajos()
+    public function getWorkOrder()
     {
         try {
             $user = JWTAuth::parseToken()->authenticate();
@@ -36,8 +36,8 @@ class OTController extends Controller
             return response()->json('ola');
         }
 
-        $ordenTrabajo = OrdenTrabajoModel::orderByDesc('created_at')->get();
-        return response()->json($ordenTrabajo);
+        $workOrder = WorkOrder::orderByDesc('created_at')->get();
+        return response()->json($workOrder);
     }
 
     public function getOrderId()
@@ -51,11 +51,11 @@ class OTController extends Controller
             return $this->sendError([], $e->getMessage(), 500);
         }
 
-        $ordenTrabajo = OrdenTrabajoModel::get()->last();
-        return response()->json($ordenTrabajo->uuid);
+        $workOrderId = WorkOrder::get()->last();
+        return response()->json($workOrderId->uuid);
     }
 
-    public function getOrdenTrabajosHoy()
+    public function getWorksToday()
     {
         try {
             $user = JWTAuth::parseToken()->authenticate();
@@ -65,8 +65,8 @@ class OTController extends Controller
         } catch (JWTException $e) {
             return $this->sendError([], $e->getMessage(), 500);
         }
-        $ordenTrabajo = OrdenTrabajoModel::whereDate('created_at', Carbon::today())->orderByDesc('created_at')->limit(10)->get();
-        return response()->json($ordenTrabajo);
+        $worksToday = WorkOrder::whereDate('created_at', Carbon::today())->orderByDesc('created_at')->limit(10)->get();
+        return response()->json($worksToday);
     }
 
     public function createWorkOrder(Request $request){
@@ -80,15 +80,15 @@ class OTController extends Controller
     }
 
 
-        $total_a_pagar = 0;
+        $totalPay = 0;
         foreach ($request->data['trabajos'] as $trabajo) {
-            $total_a_pagar += $trabajo['costo'];
+            $totalPay += $trabajo['costo'];
         }
 
-        $ordenTrabajo = OrdenTrabajoModel::get()->last();
+        $lastWorkOrder = WorkOrder::get()->last();
 
-        $workOrder = OrdenTrabajoModel::create([
-            'uuid'            => $ordenTrabajo->uuid + 1,
+        $workOrder = WorkOrder::create([
+            'uuid'            => $lastWorkOrder->uuid + 1,
             'patente'         => $request->data['patente'],
             'marca'           => $request->data['marca'],
             'modelo'          => $request->data['modelo'],
@@ -96,16 +96,16 @@ class OTController extends Controller
             'nombre_cliente'  => $request->data['nombre_cliente'],
             'mecanico'        => $request->data['mecanico'],
             'forma_pago'      => $request->data['forma_pago'],
-            'total_a_pagar'   => $total_a_pagar
+            'total_a_pagar'   => $totalPay
         ]);
 
         $lastID = $workOrder->id;
 
         foreach($request->data['trabajos'] as $trabajo){
-            TrabajosOTModel::create([
-                'ot_id'             => $lastID,
-                'nombre_trabajo'    => $trabajo['trabajo'],
-                'precio'            => $trabajo['costo']
+            WorkOrderTask::create([
+                'ot_id'      => $lastID,
+                'trabajo'    => $trabajo['trabajo'],
+                'costo'      => $trabajo['costo']
             ]);
         }
 

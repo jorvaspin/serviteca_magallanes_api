@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
 
-class OrdenTrabajoModel extends Model
+class WorkOrder extends Model
 {
     use HasFactory;
 
@@ -24,7 +24,7 @@ class OrdenTrabajoModel extends Model
 
     public function trabajos_realizados()
     {
-        return $this->hasMany(TrabajosOTModel::class, 'ot_id');
+        return $this->hasMany(WorkOrderTask::class, 'ot_id');
     }
 
     public function getTrabajosRealizadosAttribute()
