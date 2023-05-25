@@ -15,15 +15,15 @@ class CreateOrdenTrabajoTable extends Migration
     {
         Schema::create('orden_trabajo', function (Blueprint $table) {
             $table->id();
-            $table->string('uuid');
-            $table->string('patente');
-            $table->string('marca');
-            $table->string('modelo');
-            $table->integer('kilometraje');
-            $table->string('nombre_cliente');
-            $table->string('mecanico');
-            $table->string('forma_pago');
-            $table->integer('total_a_pagar');
+            $table->unsignedBigInteger('uuid')->unique();
+            $table->string('patente')->nullable();
+            $table->string('marca')->nullable();
+            $table->string('modelo')->nullable();
+            $table->integer('kilometraje')->nullable();
+            $table->string('nombre_cliente')->nullable();
+            $table->string('mecanico')->nullable();
+            $table->string('forma_pago')->nullable();
+            $table->integer('total_a_pagar')->nullable();
             $table->timestamps();
         });
     }
