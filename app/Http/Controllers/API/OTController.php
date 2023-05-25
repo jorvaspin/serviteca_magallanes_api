@@ -25,7 +25,7 @@ class OTController extends Controller
         return response()->json($response);
     }
 
-    public function getWorkOrder()
+    public function getWorkOrders()
     {
         try {
             $user = JWTAuth::parseToken()->authenticate();

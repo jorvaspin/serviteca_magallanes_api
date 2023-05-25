@@ -43,7 +43,7 @@ class WorkOrder extends Model
         $nombres_trabajo = "";
         $numero_elementos = count($array_names);
         foreach ($array_names as $key => $value) {
-            $nombres_trabajo .= $value->nombre_trabajo .  " - costo: $" . number_format($value->precio) .  " ";
+            $nombres_trabajo .= $value->trabajo .  " - costo: $" . number_format($value->costo) .  " ";
         }
         return $nombres_trabajo;
     }

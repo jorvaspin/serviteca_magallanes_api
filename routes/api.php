@@ -12,7 +12,7 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::get('/user', [AuthController::class, 'getUser']);
 
 Route::middleware('jwt.verify')->group(function() {
-    Route::get('/getWorkOrder', [OTController::class, 'getWorkOrder']);
+    Route::get('/getWorkOrders', [OTController::class, 'getWorkOrders']);
     Route::get('/getOrderId', [OTController::class, 'getOrderId']);
     Route::post('/createWorkOrder', [OTController::class, 'createWorkOrder']);
     Route::get('/getWorksToday', [OTController::class, 'getWorksToday']);
