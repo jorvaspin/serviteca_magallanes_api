@@ -11,8 +11,17 @@
     },
     "devDependencies": {
         "axios": "^0.21",
+        "eslint": "^8.41.0",
         "laravel-mix": "^6.0.6",
         "lodash": "^4.17.19",
-        "postcss": "^8.1.14"
+        "postcss": "^8.1.14",
+        "standard": "^17.0.0"
+    },
+    "eslintConfig": {
+      "extends": "./node_modules/standard/eslintrc.json"
+    },
+    "rules": {
+      "react/jsx-uses-react": "off",
+      "react/react-in-jsx-scope": "off"
     }
 }

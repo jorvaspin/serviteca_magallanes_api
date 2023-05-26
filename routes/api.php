@@ -16,6 +16,7 @@ Route::middleware('jwt.verify')->group(function() {
     Route::get('/getOrderId', [OTController::class, 'getOrderId']);
     Route::post('/createWorkOrder', [OTController::class, 'createWorkOrder']);
     Route::get('/getWorksToday', [OTController::class, 'getWorksToday']);
+    Route::get('/getLastWeekData', [OTController::class, 'getLastWeekData']);
 
     Route::get('/getDataAdmin/{data}', [DashboardController::class, 'getDataAdmin']);
     Route::get('/getLastWorksCompleted', [DashboardController::class, 'getLastWorksCompleted']);

@@ -113,4 +113,38 @@ class OTController extends Controller
             'message' => 'Orden de trabajo creada con exito'
         ]);
     }
+
+    public function getLastWeekData(){
+        try {
+            $user = JWTAuth::parseToken()->authenticate();
+            if (!$user) {
+                return $this->sendError([], "user not found", 403);
+            }
+        } catch (JWTException $e) {
+            return $this->sendError([], $e->getMessage(), 500);
+        }
+
+        $date_array = array();
+        $total_array = array();
+        $date_count = array();
+
+        $i = 0;
+        while ($i < 7) {
+            $today = Carbon::today();
+            array_push( $date_array, $today->subDays($i)->format('Y-m-d') );
+            $i++;
+        }
+
+        if(! empty( $date_array ) ){
+            foreach($date_array as $date){
+                array_push( $total_array, WorkOrder::whereDate('created_at', $date)->sum('total_a_pagar') );
+                // $date_count = WorkOrder::where( 'created_at', '>', $date )->sum('total_a_pagar');
+            }
+        }
+
+        return response()->json([
+            'date_array' => $date_array,
+            'total_array' => $total_array
+        ]);
+    }
 }
