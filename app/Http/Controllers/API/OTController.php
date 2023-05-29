@@ -85,6 +85,11 @@ class OTController extends Controller
             $totalPay += $trabajo['costo'];
         }
 
+        // calculamos el iva si es que paga con credito o debito
+        if($request->data['forma_pago'] == 'Debito/Credito'){
+            $totalPay = $totalPay * 1.19;
+        }
+
         $lastWorkOrder = WorkOrder::get()->last();
 
         $workOrder = WorkOrder::create([
