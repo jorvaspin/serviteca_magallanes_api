@@ -62,4 +62,9 @@ class User extends Authenticatable implements JWTSubject
     {
         return [];
     }
+
+    public function orden_trabajo()
+    {
+        return $this->belongTo(WorkOrder::class, 'ot_id');
+    }
 }

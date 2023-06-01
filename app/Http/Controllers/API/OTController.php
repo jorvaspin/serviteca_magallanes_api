@@ -4,6 +4,8 @@ namespace App\Http\Controllers\API;
 
 use App\Models\WorkOrder;
 use App\Models\WorkOrderTask;
+use App\Models\WorkShop;
+use App\Models\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
@@ -33,7 +35,7 @@ class OTController extends Controller
                 return $this->sendError([], "user not found", 403);
             }
         } catch (JWTException $e) {
-            return response()->json('ola');
+            return $this->sendError([], $e->getMessage(), 500);
         }
 
         $workOrder = WorkOrder::orderByDesc('created_at')->get();
@@ -51,8 +53,18 @@ class OTController extends Controller
             return $this->sendError([], $e->getMessage(), 500);
         }
 
+        // traemos los usuarios que tienen rol mecanico = 2
+        $mechanic = User::where('rol_id', 2)->get();
+
+        // traemos tambien todos los workshops disponibles
+        $workshop = WorkShop::all();
+
         $workOrderId = WorkOrder::get()->last();
-        return response()->json($workOrderId->uuid);
+        return response()->json([
+            'workOrderId' => $workOrderId->uuid,
+            'mechanic' => $mechanic,
+            'workshop' => $workshop
+        ]);
     }
 
     public function getWorksToday()
@@ -65,11 +77,22 @@ class OTController extends Controller
         } catch (JWTException $e) {
             return $this->sendError([], $e->getMessage(), 500);
         }
+
+        // traemos los mecanicos
+        $mechanics = User::where('rol_id', 2)->get();
+
         $worksToday = WorkOrder::whereDate('created_at', Carbon::today())->orderByDesc('created_at')->limit(10)->get();
-        return response()->json($worksToday);
+        return response()->json([
+            'worksToday' => $worksToday,
+            'mechanics' => $mechanics
+        ]);
     }
 
     public function createWorkOrder(Request $request){
+        // return de prueba
+        // return response()->json($request->all());
+        // exit;
+
         try {
             $user = JWTAuth::parseToken()->authenticate();
             if (!$user) {
@@ -99,6 +122,8 @@ class OTController extends Controller
             'modelo'          => $request->data['modelo'],
             'kilometraje'     => $request->data['kilometraje'],
             'nombre_cliente'  => $request->data['nombre_cliente'],
+            'user_id'         => $user->id,
+            'work_id'         => $request->data['taller'],
             'mecanico'        => $request->data['mecanico'],
             'forma_pago'      => $request->data['forma_pago'],
             'total_a_pagar'   => $totalPay
@@ -119,7 +144,7 @@ class OTController extends Controller
         ]);
     }
 
-    public function getLastWeekData(){
+    public function getLastWeekData($id){
         try {
             $user = JWTAuth::parseToken()->authenticate();
             if (!$user) {
@@ -132,6 +157,7 @@ class OTController extends Controller
         $date_array = array();
         $total_array = array();
         $date_count = array();
+        $workshop_data = array();
 
         $i = 0;
         while ($i < 7) {
@@ -141,9 +167,17 @@ class OTController extends Controller
         }
 
         if(! empty( $date_array ) ){
-            foreach($date_array as $date){
-                array_push( $total_array, WorkOrder::whereDate('created_at', $date)->sum('total_a_pagar') );
-                // $date_count = WorkOrder::where( 'created_at', '>', $date )->sum('total_a_pagar');
+            // traemos los datos de la orden de trabajo por tienda
+            if($id == 0){
+                foreach($date_array as $date){
+                    array_push( $total_array, WorkOrder::whereDate('created_at', $date)->sum('total_a_pagar') );
+                    // $date_count = WorkOrder::where( 'created_at', '>', $date )->sum('total_a_pagar');
+                }
+            }else{
+                foreach($date_array as $date){
+                    array_push( $total_array, WorkOrder::where('work_id', $id)->whereDate('created_at', $date)->sum('total_a_pagar') );
+                    // $date_count = WorkOrder::where( 'created_at', '>', $date )->sum('total_a_pagar');
+                }
             }
         }
 
